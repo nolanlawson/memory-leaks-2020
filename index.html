@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Taming memory leaks in JavaScript</title>
+    <meta charset="utf-8">
+    <style>
+      html {
+        font-family: "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell",
+        "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+      }
+      h1, h2, h3 {
+        font-weight: normal;
+      }
+      .emoji {
+        font-family: "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol",
+        "Twemoji Mozilla","Noto Color Emoji","EmojiOne Color","Android Emoji",sans-serif;
+      }
+      .remark-code, .remark-inline-code {
+        font-family: monospace;
+      }
+      .flex {
+        display: flex;
+        flex-direction: row;
+        height: 200px;
+        width: 200px;
+      }
+      img {
+        max-width: 100%;
+        max-height: 35vh;
+        object-fit: contain;
+      }
+      .remark-slide-content {
+        background-size: contain;
+      }
+      a, a:visited {
+        color: royalblue;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="./remark-latest.min.js"></script>
+    <script>
+      var slideshow = remark.create({
+        sourceUrl: './markdown.md'
+      });
+    </script>
+  </body>
+</html>
