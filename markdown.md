@@ -23,10 +23,6 @@ because we don't have the same ability to meet-and-greet beforehand, but hopeful
 
 .center[![Screenshot of tweet "Mingling" from first QueensJS meetup](./screenshot-2020-07-12-15-03-42.png)]
 
----
-
-background-image: url(./memory-leak.png)
-
 ???
 Queens JS was actually my first JavaScript meetup ever! I moved to New York six years ago. I remember it was
 summer, and my first impression of New York was the hot, sweltering garbage on the side of the road. Later on,
@@ -39,7 +35,13 @@ I went to Queens JS because I was hoping to meet some new people in New York. I 
 was actually in a back room, not upstairs! So it's kind of fitting that six years later it's in another location
 (online!).
 
+---
+
 # What is a memory leak?
+
+<br/><br/><br/>
+
+.center[![Screenshot of chrome performane monitor showing leak](./memory-leak.png)]
 
 ???
 A memory leak is basically a situation where the memory usage of your web application grows unbounded over time.
@@ -66,6 +68,8 @@ This is the familiar Chrome "Aw Snap!" page that gets shown when a page eats up 
 
 # Memory affects performance
 
+<br/>
+
 .center[![GC](./gc.png)]
 
 ???
@@ -83,8 +87,10 @@ memory was reclaimed.
 
 # Anatomy of a memory leak
 
+<br/><br/>
+
 ```js
-window.addEventListener('resize', onResize);
+window.addEventListener('resize', onResize)
 ```
 
 ???
@@ -101,9 +107,11 @@ you forgot...
 
 # Anatomy of a memory leak
 
+<br/><br/>
+
 ```js
 componentDidMount() {
-  window.addEventListener('resize', this.onResize);
+  window.addEventListener('resize', this.onResize)
 }
 ```
 
@@ -114,6 +122,8 @@ You forgot that `onResize` references `this`, which is a component.
 ---
 
 # Anatomy of a memory leak
+
+<br/><br/>
 
 ```html
 <Component>
@@ -131,6 +141,8 @@ And that component references all of its sub-components, which reference all of 
 
 # Anatomy of a memory leak
 
+<br/><br/>
+
 ```html
 <SuperComponent>
   <Component />
@@ -145,6 +157,8 @@ And it probably references its super component, via a render prop or something s
 
 # Anatomy of a memory leak
 
+<br/><br/>
+
 ```html
 <div></div>
 ```
@@ -156,6 +170,8 @@ And the component also references the DOM.
 ---
 
 # Anatomy of a memory leak
+
+<br/><br/>
 
 ```html
 <div>
@@ -184,8 +200,10 @@ frameworks: React, Vue, Angular, etc.
 
 # Anatomy of a memory leak
 
+<br/><br/>
+
 ```js
-window.addEventListener('resize', this.onResize);
+window.addEventListener('resize', this.onResize)
 ```
 
 ???
@@ -222,9 +240,12 @@ And also the whole jungle.
 
 # Fixing the leak
 
+<br/><br/>
+
 ```js
 componentWillUnmount() {
-  window.removeEventListener('resize', this.onResize);
+  window.removeEventListener('resize', 
+    this.onResize)
 }
 ```
 
@@ -238,6 +259,8 @@ A lot of memory leaks are like this – really simple mistakes that are easy to 
 ---
 
 # What kinds of things leak?
+
+<br/>
 
 - Event listeners
 - Timers
@@ -264,6 +287,8 @@ But you have to actually know to do this and be diligent about it.
 ---
 
 # Memory leaks are everywhere
+
+<br/>
 
 > *"The majority of OOMs [Out Of Memory] are caused by web pages"*
 >
@@ -308,8 +333,10 @@ On an MPA (Multi-Page App) like Wikipedia, you can't possibly see memory grow as
 
 # Browsers are smart, though
 
+<br/><br/>
+
 ```js
-element.addEventListener('click', onClick);
+element.addEventListener('click', onClick)
 
 // If element is GC'ed, listener will be GC'ed
 ```
@@ -326,7 +353,7 @@ Jake Archibald has a good post about this.
 
 ---
 
-# OK, so how do I fix this?
+# Finding memory leaks
 
 .center[![Heap snapshot screenshot](./heapsnap.png)]
 
@@ -358,11 +385,13 @@ including an EventListener. This is my leak!
 
 # Automated testing
 
+<br/><br/>
+
 ```js
 // Returns all live Objects
 // Available in Chrome DevTools and Puppeteer
 
-queryObjects(Object.prototype);
+queryObjects(Object.prototype)
 ```
 
 ???
@@ -374,12 +403,14 @@ how to do this, and I have some sample code for you as well.
 
 # Measurement
 
+<br/><br/>
+
 ```js
 // Measures the total page memory usage in bytes
 // Available in Chrome 83+
 
-const memory = await performance.measureMemory();
-console.log(memory.bytes);
+const memory = await performance.measureMemory()
+console.log(memory.bytes)
 ```
 
 ???
@@ -393,6 +424,8 @@ headers in order to get it to work. But it is very promising to automate this ki
 ---
 
 # Thank you
+
+<br/><br/>
 
 ## <span class=emoji>🌎</span> nolanlawson.com
 ## <span class=emoji>🐘</span> @nolan@toot.cafe
