@@ -40,9 +40,44 @@
   <body>
     <script src="./remark-latest.min.js"></script>
     <script>
-      var slideshow = remark.create({
-        sourceUrl: './markdown.md'
-      });
+      (() => {
+        const $ = document.querySelector.bind(document)
+        const slideshow = remark.create({
+          sourceUrl: './markdown.md'
+        });
+        slideshow.on('showSlide', slide => {
+          Promise.resolve().then(() => {
+            console.log(slide)
+            const slideNode = $('.remark-slide-container.remark-visible')
+            if (slideNode.getAttribute('data-adjusted')) {
+              return
+            }
+            const content = slideNode.querySelector('.remark-slide-content')
+            const children = [...content.children]
+              .filter(_ => _.tagName !== 'H1')
+              .filter(_ => (!_.classList.contains('remark-slide-number')))
+            const first = children[0]
+            const last = children.slice(-1)[0]
+            const h1 = content.querySelector('h1')
+
+            if (first && last) {
+              const parentRect =
+              const containerRect = content.getBoundingClientRect()
+              const firstRect = first.getBoundingClientRect()
+              const lastRect = last.getBoundingClientRect()
+              const h1Rect = h1.getBoundingClientRect()
+              const childrenHeight = lastRect.bottom - firstRect.top
+              const margin = (containerRect.height - childrenHeight - h1Rect.height) / 2
+              for (const child of children) {
+                child.style.transform = `translateY(${margin}px)`
+              }
+            }
+
+            slideNode.setAttribute('data-adjusted', 'true')
+
+          })
+        })
+      })()
     </script>
   </body>
 </html>

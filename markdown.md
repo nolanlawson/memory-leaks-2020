@@ -64,14 +64,20 @@ This is the familiar Chrome "Aw Snap!" page that gets shown when a page eats up 
 
 ---
 
-# Future Chrome UI
+# Memory affects performance
 
-.center[![Animated GIF showing a new Chrome UI with leaking iframes and a "ran out of memory" message](./proompt-demo-faster.gif)]
+.center[![GC](./gc.png)]
 
 ???
 
-By the way, Chrome is planning to replace this UI with a clearer one that will actually say that the website
-ran out of memory. So your customers will know exactly what's wrong with your page!
+Even without your page actually crashing, you can have other problems.
+The larger the memory gets, the more time the browser may end up spending doing Garbage Collection, and the more time 
+it may spend processing whatever code is leaking**.
+
+As an anecdote, my wife was using a webapp recently (I won't say which one), and she was complaining, "Ugh, this
+app keeps getting slower and slower until I have to refresh it." I said, "Let me see the Performance Monitor in Chrome"
+and... guess what! It was a memory leak. The app was just using up more and more memory until she refreshed, and the
+memory was reclaimed.
 
 ---
 
@@ -101,17 +107,91 @@ componentDidMount() {
 }
 ```
 
-- `this.onResize` references `this`
-- `this` is a component
+???
+
+You forgot that `onResize` references `this`, which is a component.
+
+---
+
+# Anatomy of a memory leak
+
+```html
+<Component>
+  <SubComponent />
+  <SubComponent />
+  <SubComponent />
+</Component>
+```
 
 ???
 
-You forgot that `onResize` references `this`, which is a component. And that component references all of its sub-components,
-which reference all of their subcomponents. And it probably also references the DOM, and it references its parent,
-so before you know it, you're leaking your entire component structure every time a user navigates between pages in your app.
+And that component references all of its sub-components, which reference all of their subcomponents.
+
+---
+
+# Anatomy of a memory leak
+
+```html
+<SuperComponent>
+  <Component />
+</SuperComponent>
+```
+
+???
+
+And it probably references its super component, via a render prop or something similar.
+
+---
+
+# Anatomy of a memory leak
+
+```html
+<div></div>
+```
+
+???
+
+And the component also references the DOM.
+
+---
+
+# Anatomy of a memory leak
+
+```html
+<div>
+  <div>
+    <button />
+  </div>
+  <div>
+    <canvas />
+  </div>
+  <div>
+    <iframe />
+  </div>
+</div>
+```
+
+???
+
+Which of course references the whole DOM tree. And if it references an iframe, it references a whole _other_ document...
+
+So before you know it, you're leaking your entire component structure every time a user navigates between pages in your app.
 
 It sounds silly, but this is what a lot of memory leaks out there in the wild actually look like! It applies to all
 frameworks: React, Vue, Angular, etc.
+
+---
+
+# Anatomy of a memory leak
+
+```js
+window.addEventListener('resize', this.onResize);
+```
+
+???
+
+And that's how this tiny little memory leak becomes something that can leak megabytes, just as the user is navigating
+around your app.
 
 ---
 
@@ -119,7 +199,7 @@ background-image: url(./Banana-Single.jpg)
 
 ???
 
-Joe Armstrong has a quote about OOP that is unrelated, but I feel like it applies pretty well here. It's as if all
+To appropriate a quote from Joe Armstrong, it's as if all
 you wanted was the banana...
 
 ---
@@ -205,22 +285,6 @@ background-image: url(./bleak.png)
 
 And some more evidence. BLeak is a research project where they found over 50 memory leaks in popular websites and
 frameworks. If you start looking for memory leaks, you will find them.
-
----
-
-# Memory affects performance
-
-.center[![GC](./gc.png)]
-
-???
-
-And this is a serious problem! The larger the memory gets, the more time the browser may end up spending doing
-Garbage Collection, and the more time it may spend processing your event listeners.
-
-As an anecdote, my wife was using a webapp recently (I won't say which one), and she was complaining, "Ugh, this
-app keeps getting slower and slower until I have to refresh it." I said, "Let me see the Performance Monitor in Chrome"
-and... guess what! It was a memory leak. The app was just using up more and more memory until she refreshed, and the
-memory was reclaimed.
 
 ---
 
@@ -329,8 +393,6 @@ headers in order to get it to work. But it is very promising to automate this ki
 ---
 
 # Thank you
-
-<br/>
 
 ## <span class=emoji>🌎</span> nolanlawson.com
 ## <span class=emoji>🐘</span> @nolan@toot.cafe
