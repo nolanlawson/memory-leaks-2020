@@ -4,9 +4,16 @@ class: center, middle
 
 ## Nolan Lawson, 2020
 
+<br/>
+<br/>
+
+###### Press P for speaker notes
+
+
 ???
 Hi, my name is Nolan Lawson, and I'd like to talk to you about memory leaks.
 
+<br/><br/>
 ---
 
 # Nolan Lawson (me)
@@ -41,12 +48,12 @@ was actually in a back room, not upstairs! So it's kind of fitting that six year
 
 <br/><br/><br/>
 
-.center[![Screenshot of chrome performane monitor showing leak](./memory-leak.png)]
+<video autoplay muted loop playsinline src="./Kazam_screencast_00015.webm" />
 
 ???
 A memory leak is basically a situation where the memory usage of your web application grows unbounded over time.
 
-This is a screenshot of the Chrome Dev Tools "Performance Monitor" tool. One cool thing is can do is show how much
+This is a video of the Chrome Dev Tools "Performance Monitor" tool. One cool thing is can do is show how much
 memory your website is using over time.
 
 As we you can see, we have a few garbage collections (where the browser reclaims unused memory), but the overall
@@ -115,6 +122,9 @@ componentDidMount() {
 }
 ```
 
+
+.center[![closure to component](./closure-to-component.png)]
+
 ???
 
 You forgot that `onResize` references `this`, which is a component.
@@ -123,15 +133,7 @@ You forgot that `onResize` references `this`, which is a component.
 
 # Anatomy of a memory leak
 
-<br/><br/>
-
-```html
-<Component>
-  <SubComponent />
-  <SubComponent />
-  <SubComponent />
-</Component>
-```
+.center[![component and sub](./component-and-sub.png)]
 
 ???
 
@@ -141,13 +143,7 @@ And that component references all of its sub-components, which reference all of 
 
 # Anatomy of a memory leak
 
-<br/><br/>
-
-```html
-<SuperComponent>
-  <Component />
-</SuperComponent>
-```
+.center[![component and super](./component-and-super.png)]
 
 ???
 
@@ -157,11 +153,7 @@ And it probably references its super component, via a render prop or something s
 
 # Anatomy of a memory leak
 
-<br/><br/>
-
-```html
-<div></div>
-```
+.center[![component and div](./component-and-div.png)]
 
 ???
 
@@ -171,25 +163,19 @@ And the component also references the DOM.
 
 # Anatomy of a memory leak
 
-<br/><br/>
-
-```html
-<div>
-  <div>
-    <button />
-  </div>
-  <div>
-    <canvas />
-  </div>
-  <div>
-    <iframe />
-  </div>
-</div>
-```
+.center[![dom tree](./dom-tree.png)]
 
 ???
 
 Which of course references the whole DOM tree. And if it references an iframe, it references a whole _other_ document...
+
+---
+
+# Anatomy of a memory leak
+
+.center[![big structure](./big-structure.png)]
+
+???
 
 So before you know it, you're leaking your entire component structure every time a user navigates between pages in your app.
 
@@ -315,7 +301,7 @@ frameworks. If you start looking for memory leaks, you will find them.
 
 # SPAs vs MPAs
 
-.center[![Wikipedia](./wikipedia.png)]
+.center[![memory cleared on navigate](./memory-cleared.png)]
 
 ???
 
@@ -355,7 +341,9 @@ Jake Archibald has a good post about this.
 
 # Finding memory leaks
 
-.center[![Heap snapshot screenshot](./heapsnap.png)]
+<br/>
+
+.center[![Heap snapshot screenshot](./snapshot4.png)]
 
 ???
 
@@ -367,9 +355,11 @@ I won't go over the full contents of that blog post, so you can read it in your 
 
 ---
 
-# Manual testing
+# Reproducing the leak
 
-.center[![Heap snapshot screenshot](./heapsnap2.png)]
+<br/>
+
+.center[![do the leak several times](./leak-scenario.png)]
 
 ???
 
@@ -377,6 +367,16 @@ The basic idea is you want to repeat some action in your app – for instance, g
 back button – and then repeat that _x_ number of times. Then you compare the memory before and after, and look
 for any objects that were created _x_ times but never deleted. This is the best way to find the source of your leak,
 because remember, we're looking for the banana, not the gorilla or the jungle.
+
+---
+
+# Identifying the leak
+
+<br/>
+
+.center[![Heap snapshot screenshot](./heapsnap2.png)]
+
+???
 
 In this screenshot, I've run a scenario 7 times, and I can see a bunch of objects that are leaking 7 times,
 including an EventListener. This is my leak!
@@ -429,6 +429,11 @@ headers in order to get it to work. But it is very promising to automate this ki
 
 ## <span class=emoji>🌎</span> nolanlawson.com
 ## <span class=emoji>🐘</span> @nolan@toot.cafe
+
+<br/><br/>
+<br/><br/>
+
+#### [nolanlawson.github.io/memory-leaks-2020](https://nolanlawson.github.io/memory-leaks-2020)
 
 ???
 
