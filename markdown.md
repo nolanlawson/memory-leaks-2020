@@ -77,7 +77,7 @@ This is the familiar Chrome "Aw Snap!" page that gets shown when a page eats up 
 
 <br/>
 
-.center[![GC](./gc.png)]
+.center[![GC](./gc3.png)]
 
 ???
 
