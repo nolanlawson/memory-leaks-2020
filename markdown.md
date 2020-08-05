@@ -71,6 +71,8 @@ The main reason you should care is that if you use up too much memory, the brows
 
 This is the familiar Chrome "Aw Snap!" page that gets shown when a page eats up too much memory.
 
+Obviously this isn't a great user experience, so this is not what we want.
+
 ---
 
 # Memory affects performance
@@ -84,6 +86,9 @@ This is the familiar Chrome "Aw Snap!" page that gets shown when a page eats up 
 Even without your page actually crashing, you can have other problems.
 The larger the memory gets, the more time the browser may end up spending doing Garbage Collection, and the more time 
 it may spend processing whatever code is leaking**.
+
+It's like a canoe that's filling up with water, and the browser is frantically trying to bail out as much water as
+it can. If it's spending time doing that, it can't spend time running the rest of your webapp.
 
 As an anecdote, my wife was using a webapp recently (I won't say which one), and she was complaining, "Ugh, this
 app keeps getting slower and slower until I have to refresh it." I said, "Let me see the Performance Monitor in Chrome"
@@ -267,8 +272,8 @@ A lot of memory leaks are like this – really simple mistakes that are easy to 
 So throughout my career, I've dealt with a lot of memory leaks. This is just a partial list of things that I've seen
 leaking in web applications. Basically everything can leak!
 
-In most cases, the solutions are not complicated: call "unsubscribe", or "disconnect", or "removeListener", or whatever.
-But you have to actually know to do this and be diligent about it.
+In most cases, the solutions are not that complicated: call "unsubscribe", or "disconnect", or "removeListener", 
+or whatever. But you have to actually know to do this and be diligent about it.
 
 ---
 
@@ -285,6 +290,13 @@ But you have to actually know to do this and be diligent about it.
 Memory leaks are actually a huge problem on the web today. Most web pages don't even know that they're leaking. But
 a lot of them are! Here's two members of the Chrome team asserting that they believe most OOMs are caused by webpages,
 not the browser itself.
+
+I used to work on a browser performance team (at Microsoft Edge), so I know that browsers often go to heroic lengths
+to deal with the Wild West that is the Web. If you've got a hundred browser tabs open, browsers have to work very
+hard to throttle, or suspend, or terminate those tabs just to keep the browser running smoothly.
+
+If your browser
+is using up a lot of memory, it may not be the browser's fault - it could be the web pages' fault.
 
 ---
 
@@ -353,6 +365,10 @@ let's look at manual testing.
 I have a blog post where I document how to use the Chrome Dev Tools to identify memory leaks in your web application.
 I won't go over the full contents of that blog post, so you can read it in your own time.
 
+Essentially you want to use the "heap snapshot" tool in Chrome, which takes a snapshot of all the live objects
+in memory in your web app. You can use this to take two snapshots, and then diff the two to see which objects
+were allocated between the second one and the first.
+
 ---
 
 # Reproducing the leak
@@ -363,14 +379,14 @@ I won't go over the full contents of that blog post, so you can read it in your 
 
 ???
 
-The basic idea is you want to repeat some action in your app – for instance, go to this page and then press the 
-back button – and then repeat that _x_ number of times. Then you compare the memory before and after, and look
+The basic idea is you want to repeat some action in your app – for instance, open and close a modal dialog – 
+and then repeat that _x_ number of times. Then you compare the memory before and after, and look
 for any objects that were created _x_ times but never deleted. This is the best way to find the source of your leak,
 because remember, we're looking for the banana, not the gorilla or the jungle.
 
 ---
 
-# Identifying the leak
+# Finding the signal in the noise
 
 <br/>
 
@@ -398,6 +414,9 @@ queryObjects(Object.prototype)
 
 Thankfully, this process can also be automated. I have some blog posts from Addy Osmani and Chris Guttandin explaining
 how to do this, and I have some sample code for you as well.
+
+This code, `queryObjects`, will return all objects live in memory. You can use it similarly to how you would use
+the heap snapshot tool, to diff the results and see what's leaking between two snapshots.
 
 ---
 
